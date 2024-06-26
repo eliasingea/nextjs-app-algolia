@@ -28,7 +28,10 @@ const Header = () => {
     const setSubmitState = (props: { state: { query: string } }) => {
         let { state } = props;
         router.push(`/search?q=${state.query}`)
+
     };
+
+
 
     const querySuggestionsPlugin = createQuerySuggestionsPlugin({
         searchClient,

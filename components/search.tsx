@@ -11,6 +11,8 @@ import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
 import Hit from "./Hit";
 const client = algoliasearch("latency", "6be0576ff61c053d5f9a3225e2a90f76");
+import type { InstantSearchProps } from 'react-instantsearch';
+import { useSearchParams } from "next/navigation";
 
 interface SearchProps {
   category: boolean;
@@ -18,10 +20,17 @@ interface SearchProps {
 
 
 function SearchBox(props: any) {
-  const { query } = useSearchBox(props);
+  const { query, refine } = useSearchBox(props);
+  const searchParams = useSearchParams();
+  const search = searchParams.get("q") as string;
+
+  if (search && (query !== search)) {
+    refine(search);
+  }
 
   return null;
 }
+
 
 export function Search({ category }: SearchProps) {
 
@@ -32,7 +41,7 @@ export function Search({ category }: SearchProps) {
         indexName="instant_search"
         routing={{
           stateMapping: {
-            stateToRoute(uiState) {
+            stateToRoute(uiState: UiState) {
               const indexState = uiState["instant_search"];
               return {
                 brand: indexState.refinementList?.brand,
