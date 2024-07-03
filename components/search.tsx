@@ -2,6 +2,7 @@
 import algoliasearch from "algoliasearch/lite";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
 import {
+  Configure,
   Hits,
   RefinementList,
   useInstantSearch,
@@ -12,7 +13,8 @@ import type { UiState } from "instantsearch.js";
 import Hit from "./Hit";
 const client = algoliasearch("latency", "6be0576ff61c053d5f9a3225e2a90f76");
 import type { InstantSearchProps } from 'react-instantsearch';
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface SearchProps {
   category: boolean;
@@ -33,6 +35,18 @@ function SearchBox(props: any) {
 
 
 export function Search({ category }: SearchProps) {
+
+
+  const [collectionHandle, setCollectionHandle] = useState("")
+
+
+  let pathname = usePathname();
+
+  useEffect(() => {
+    if (!category) return;
+    const decodedUrl = decodeURIComponent(pathname);
+    setCollectionHandle(decodedUrl?.split(`/`).at(-1)?.split("?")[0])
+  }, [pathname])
 
   return (
     <div>
@@ -64,44 +78,32 @@ export function Search({ category }: SearchProps) {
           },
           router: {
             createURL({ qsModule, routeState, location }) {
-              console.log(location);
-              let pathname = null;
               let queryString = null;
-              if (category) {
-                pathname = `/plp/${routeState.categories}`
-                queryString = qsModule.stringify(
-                  {
-                    brand: routeState.brand,
-                  },
-                  {
-                    addQueryPrefix: true,
-                    arrayFormat: "comma",
-                  },
-                );
-              } else {
-                pathname = `/search`
-                queryString = qsModule.stringify(
-                  {
-                    brand: routeState.brand,
-                    q: routeState.q,
-                    categories: routeState.categories
-                  },
-                  {
-                    addQueryPrefix: true,
-                    arrayFormat: "comma",
-                  },
-                );
-              }
+
+              queryString = qsModule.stringify(
+                {
+                  brand: routeState.brand,
+                  q: routeState.q,
+                  categories: routeState.categories
+                },
+                {
+                  addQueryPrefix: true,
+                  arrayFormat: "comma",
+                },
+              );
+
               const url = `${location.origin}${pathname}${queryString}`;
 
               return url;
             },
             parseURL({ location, qsModule }) {
-              const decodedUrl = decodeURIComponent(location.pathname);
+              // const decodedUrl = decodeURIComponent(location.pathname);
               let { brand, q, categories } = qsModule.parse(location.search.slice(1));
-              if (category) categories = decodedUrl?.split(`/`).at(-1)?.split("?")[0];
+              // if (decodedUrl) setCollectionHandle(decodedUrl?.split(`/`).at(-1)?.split("?")[0]);
               return {
-                categories,
+                categories: parseParamStringList(
+                  categories as string | undefined,
+                ),
                 brand: parseParamStringList(
                   brand as string | undefined,
                 ),
@@ -120,9 +122,10 @@ export function Search({ category }: SearchProps) {
         }}
       >
         <SearchBox />
+        <Configure filters={collectionHandle ? `categories:${collectionHandle}` : ""} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
-            <div className="w-1/3">
+            <div className="w-[15%]">
               <div>
                 <strong>brand</strong>
                 <RefinementList
@@ -135,7 +138,7 @@ export function Search({ category }: SearchProps) {
                 <RefinementList attribute="categories" />
               </div>
             </div>
-            <div className="w-2/3">
+            <div className="w-full">
               <strong>results</strong>
               <Hits hitComponent={Hit} classNames={
                 {
