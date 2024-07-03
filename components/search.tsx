@@ -11,11 +11,11 @@ import {
 import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
 import Hit from "./Hit";
-const client = algoliasearch("latency", "6be0576ff61c053d5f9a3225e2a90f76");
-import type { InstantSearchProps } from 'react-instantsearch';
+const client = algoliasearch("PMK1FBZCMK", "ed5c1784106c9f709e6d49ee87f57eb6");
 import { useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+const INDEX_NAME = "algoflix_CONFIGURED"
 interface SearchProps {
   category: boolean;
 }
@@ -52,23 +52,24 @@ export function Search({ category }: SearchProps) {
     <div>
       <InstantSearchNext
         searchClient={client}
-        indexName="instant_search"
+        indexName={INDEX_NAME}
+        insights
         routing={{
           stateMapping: {
             stateToRoute(uiState: UiState) {
-              const indexState = uiState["instant_search"];
+              const indexState = uiState[INDEX_NAME];
               return {
-                brand: indexState.refinementList?.brand,
-                categories: indexState.refinementList?.categories,
+                cast: indexState.refinementList?.cast,
+                genres: indexState.refinementList?.genres,
                 q: indexState.query
               };
             },
             routeToState(routeState: UiState) {
               const state = {
-                instant_search: {
+                [INDEX_NAME]: {
                   refinementList: {
-                    brand: routeState.brand,
-                    categories: routeState.categories,
+                    cast: routeState.cast,
+                    genres: routeState.genres,
                   },
                   query: routeState.q
                 }
@@ -98,14 +99,14 @@ export function Search({ category }: SearchProps) {
             },
             parseURL({ location, qsModule }) {
               // const decodedUrl = decodeURIComponent(location.pathname);
-              let { brand, q, categories } = qsModule.parse(location.search.slice(1));
+              let { cast, q, genres } = qsModule.parse(location.search.slice(1));
               // if (decodedUrl) setCollectionHandle(decodedUrl?.split(`/`).at(-1)?.split("?")[0]);
               return {
-                categories: parseParamStringList(
-                  categories as string | undefined,
+                genres: parseParamStringList(
+                  genres as string | undefined,
                 ),
-                brand: parseParamStringList(
-                  brand as string | undefined,
+                cast: parseParamStringList(
+                  cast as string | undefined,
                 ),
                 q: parseParamStringList(
                   q as string | undefined,
@@ -122,27 +123,29 @@ export function Search({ category }: SearchProps) {
         }}
       >
         <SearchBox />
-        <Configure filters={collectionHandle ? `categories:${collectionHandle}` : ""} />
+        <Configure filters={collectionHandle ? `genres:${collectionHandle}` : ""} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
             <div className="w-[15%]">
               <div>
                 <strong>brand</strong>
                 <RefinementList
-                  attribute="brand"
+                  attribute="cast.name"
 
                 />
               </div>
               <div>
                 <strong>categories</strong>
-                <RefinementList attribute="categories" />
+                <RefinementList attribute="genres" />
               </div>
             </div>
             <div className="w-full">
               <strong>results</strong>
               <Hits hitComponent={Hit} classNames={
                 {
-                  list: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4",
+                  root: "bg-white",
+                  list: "flex flex-wrap",
+                  item: "group relative m-0 flex h-78 w-96 rounded-xl shadow-xl ring-gray-900/5 sm:mx-auto sm:max-w-lg"
 
                 }
               } />

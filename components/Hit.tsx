@@ -1,30 +1,24 @@
 import React from 'react'
 
 type CustomHit = BaseHit<{
-    name: string,
-    rating: number,
-    price: number,
-    image: string,
+    title: string,
+    bayesian_avg: number,
+    backdrop_path: string,
+    cast: object[],
+    overview: string,
+    genres: string[]
 }>;
-import Image from 'next/image';
 import type { Hit as BaseHit, } from "instantsearch.js/es/types";
 
 const Hit = ({ hit }: { hit: CustomHit }) => {
     return (
-        <div className="bg-white shadow-md pl-4 rounded-md h-60">
-            <div className="">
-
-                <Image
-                    src={hit.image}
-                    width={128}
-                    height={128}
-                    alt="Picture of the author"
-                />
+        <div className="p-4">
+            <div className="z-10 h-full w-full overflow-hidden rounded-xl border border-gray-200 opacity-80 transition duration-300 ease-in-out group-hover:opacity-100 dark:border-gray-700 dark:opacity-70">
+                <img src={`https://image.tmdb.org/t/p/original${hit.backdrop_path}`} className="animate-fade-in block h-full w-full scale-100 transform object-cover object-center opacity-100 transition duration-300 group-hover:scale-110" alt="" />
             </div>
-            <h2 className="text-l font-semibold">{hit.name}</h2>
-            <div className="flex items-center ">
-                <span className="text-gray-500">Rating: {hit.rating}</span>
-                <span className="text-gray-500 ml-4">Price: {hit.price}</span>
+            <div className="absolute bottom-0 z-20 m-0 pb-4 ps-4 transition duration-300 ease-in-out group-hover:-translate-y-1 group-hover:translate-x-3 group-hover:scale-110">
+                <h1 className="font-serif text-2xl font-bold text-white shadow-xl">{hit.title}</h1>
+                <h1 className="text-sm font-bold text-white shadow-xl">{hit.genres[0]}</h1>
             </div>
         </div>
     )

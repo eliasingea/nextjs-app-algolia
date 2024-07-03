@@ -4,7 +4,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "cdn-demo.algolia.com",
+        hostname: "image.tmdb.org",
         port: "",
         pathname: "/**",
       },
