@@ -13,8 +13,8 @@ import algoliasearch from "algoliasearch/lite";
 import { useSearchParams } from "next/navigation";
 
 const searchClient = algoliasearch(
-    "latency",
-    "6be0576ff61c053d5f9a3225e2a90f76"
+    "PMK1FBZCMK",
+    "ed5c1784106c9f709e6d49ee87f57eb6"
 );
 
 
@@ -35,7 +35,7 @@ const Header = () => {
 
     const querySuggestionsPlugin = createQuerySuggestionsPlugin({
         searchClient,
-        indexName: "instant_search_demo_query_suggestions",
+        indexName: "algoflix_CONFIGURED_query_suggestions",
         transformSource({ source }) {
             return {
                 ...source,
@@ -73,6 +73,9 @@ const Header = () => {
                         query: search || "",
                     }}
                     onSubmit={setSubmitState}
+                    classNames={{
+                        panel: "z-50"
+                    }}
                 />
             </div>
             <h1 className="text-xl text-blue-800 w-24 pt-2">Account</h1>

@@ -1,6 +1,5 @@
 
-
-export default function SearchPage() {
+export default function CategoryPage() {
     return (
         <div>
             hey

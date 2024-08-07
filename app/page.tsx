@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.description}>
-        <Link href="/plp/Appliances">
+        <Link href="/plp/Drama">
           <h2>PLP - Appliances</h2>
         </Link>
         <i>

@@ -2,11 +2,12 @@
 import algoliasearch from "algoliasearch/lite";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
 import {
-  Configure,
   Hits,
   RefinementList,
   useInstantSearch,
   useSearchBox,
+  Configure,
+  UseSearchBoxProps,
 } from "react-instantsearch";
 import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
@@ -16,17 +17,16 @@ import { useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const INDEX_NAME = "algoflix_CONFIGURED"
-interface SearchProps {
-  category: boolean;
-}
 
 
-function SearchBox(props: any) {
-  const { query, refine } = useSearchBox(props);
+function SearchBox(props: UseSearchBoxProps) {
+  let { query, refine } = useSearchBox(props);
+  const { setIndexUiState } = useInstantSearch();
   const searchParams = useSearchParams();
   const search = searchParams.get("q") as string;
-
+  if (typeof query === "object") query = query[0]
   if (search && (query !== search)) {
+    setIndexUiState({})
     refine(search);
   }
 
@@ -34,44 +34,34 @@ function SearchBox(props: any) {
 }
 
 
-export function Search({ category }: SearchProps) {
-
-
-  const [collectionHandle, setCollectionHandle] = useState("")
-
-
-  let pathname = usePathname();
-
-  useEffect(() => {
-    if (!category) return;
-    const decodedUrl = decodeURIComponent(pathname);
-    setCollectionHandle(decodedUrl?.split(`/`).at(-1)?.split("?")[0])
-  }, [pathname])
-
+export function Search() {
   return (
     <div>
       <InstantSearchNext
         searchClient={client}
         indexName={INDEX_NAME}
         insights
+        future={{
+          preserveSharedStateOnUnmount: true
+        }}
         routing={{
           stateMapping: {
             stateToRoute(uiState: UiState) {
               const indexState = uiState[INDEX_NAME];
               return {
-                cast: indexState.refinementList?.cast,
-                genres: indexState.refinementList?.genres,
-                q: indexState.query
+                q: indexState.query,
+                type: indexState.refinementList?.record_type,
+                cast: indexState.refinementList?.["cast.name"]
               };
             },
             routeToState(routeState: UiState) {
               const state = {
                 [INDEX_NAME]: {
                   refinementList: {
-                    cast: routeState.cast,
-                    genres: routeState.genres,
+                    ["cast.name"]: routeState.cast,
+                    record_type: routeState.type
                   },
-                  query: routeState.q
+                  query: routeState.q,
                 }
               };
               return state;
@@ -80,12 +70,12 @@ export function Search({ category }: SearchProps) {
           router: {
             createURL({ qsModule, routeState, location }) {
               let queryString = null;
-
+              let pathname = "/search"
               queryString = qsModule.stringify(
                 {
-                  brand: routeState.brand,
                   q: routeState.q,
-                  categories: routeState.categories
+                  cast: routeState.cast,
+                  type: routeState.type
                 },
                 {
                   addQueryPrefix: true,
@@ -98,15 +88,13 @@ export function Search({ category }: SearchProps) {
               return url;
             },
             parseURL({ location, qsModule }) {
-              // const decodedUrl = decodeURIComponent(location.pathname);
-              let { cast, q, genres } = qsModule.parse(location.search.slice(1));
-              // if (decodedUrl) setCollectionHandle(decodedUrl?.split(`/`).at(-1)?.split("?")[0]);
+              let { cast, q, type } = qsModule.parse(location.search.slice(1));
               return {
-                genres: parseParamStringList(
-                  genres as string | undefined,
-                ),
                 cast: parseParamStringList(
                   cast as string | undefined,
+                ),
+                type: parseParamStringList(
+                  type as string | undefined,
                 ),
                 q: parseParamStringList(
                   q as string | undefined,
@@ -119,28 +107,48 @@ export function Search({ category }: SearchProps) {
               }
               history.pushState({}, "", url);
             },
+            cleanUrlOnDispose: true,
           },
         }}
       >
         <SearchBox />
-        <Configure filters={collectionHandle ? `genres:${collectionHandle}` : ""} />
+        <Configure />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
             <div className="w-[15%]">
-              <div>
-                <strong>brand</strong>
+              <div className="pt-4 pb-4">
+                <h2 className="text-blue-900 text-base font-semibold mb-3">Cast</h2>
                 <RefinementList
                   attribute="cast.name"
-
+                  classNames={{
+                    list: 'flex flex-col gap-y-3',
+                    label: 'inline-block w-full flex cursor-pointer items-center',
+                    labelText: 'ml-2',
+                    checkbox:
+                      'w-7 h-7 cursor-pointer appearance-none border border-blue-300 rounded-lg flex-shrink-0 transition-colors hover:bg-blue-100 checked:hover:bg-blue-300 checked:bg-blue-300 checked:bg-tick checked:bg-no-repeat checked:bg-center checked:bg-[length:0.8rem]',
+                    count: 'ml-auto text-gray-500 text-sm',
+                    selectedItem: 'font-semibold',
+                  }}
                 />
               </div>
               <div>
-                <strong>categories</strong>
-                <RefinementList attribute="genres" />
+                <h2 className="text-blue-900 text-base font-semibold mb-3">Type</h2>
+                <RefinementList
+                  attribute="record_type"
+                  classNames={{
+                    list: 'flex flex-col gap-y-3',
+                    label: 'inline-block w-full flex cursor-pointer items-center',
+                    labelText: 'ml-2',
+                    checkbox:
+                      'w-7 h-7 cursor-pointer appearance-none border border-blue-300 rounded-lg flex-shrink-0 transition-colors hover:bg-blue-100 checked:hover:bg-blue-300 checked:bg-blue-300 checked:bg-tick checked:bg-no-repeat checked:bg-center checked:bg-[length:0.8rem]',
+                    count: 'ml-auto text-gray-500 text-sm',
+                    selectedItem: 'font-semibold',
+                  }}
+                />
               </div>
+
             </div>
             <div className="w-full">
-              <strong>results</strong>
               <Hits hitComponent={Hit} classNames={
                 {
                   root: "bg-white",
@@ -154,7 +162,7 @@ export function Search({ category }: SearchProps) {
         </div>
         <DebugIS />
       </InstantSearchNext>
-    </div>
+    </div >
   );
 }
 
