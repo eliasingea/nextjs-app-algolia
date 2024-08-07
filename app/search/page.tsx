@@ -1,9 +1,9 @@
-import { Search } from "@/components/search";
+import { Search } from "@/components/Search";
 
 
 
 export const dynamic = "force-dynamic";
 
 export default function SearchPage() {
-    return <Search />;
+    return <Search category={""} />;
 }

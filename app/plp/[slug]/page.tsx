@@ -1,7 +1,7 @@
-import { Categories } from "@/components/Categories";
+import { Search } from "@/components/Search";
 
 export const dynamic = "force-dynamic";
 
 export default function CategoryPage({ params }: { params: { slug: string } }) {
-  return <Categories category={params.slug} />;
+  return <Search category={params.slug} />;
 }

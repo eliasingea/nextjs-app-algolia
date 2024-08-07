@@ -18,6 +18,9 @@ import { useEffect, useState } from "react";
 
 const INDEX_NAME = "algoflix_CONFIGURED"
 
+interface SearchProps {
+  category: string;
+}
 
 function SearchBox(props: UseSearchBoxProps) {
   let { query, refine } = useSearchBox(props);
@@ -34,7 +37,7 @@ function SearchBox(props: UseSearchBoxProps) {
 }
 
 
-export function Search() {
+export function Search({ category }: SearchProps) {
   return (
     <div>
       <InstantSearchNext
@@ -51,7 +54,8 @@ export function Search() {
               return {
                 q: indexState.query,
                 type: indexState.refinementList?.record_type,
-                cast: indexState.refinementList?.["cast.name"]
+                cast: indexState.refinementList?.["cast.name"],
+                genres: indexState.configure?.filters?.split(":")[1]
               };
             },
             routeToState(routeState: UiState) {
@@ -60,6 +64,9 @@ export function Search() {
                   refinementList: {
                     ["cast.name"]: routeState.cast,
                     record_type: routeState.type
+                  },
+                  configure: {
+                    filters: routeState.genres
                   },
                   query: routeState.q,
                 }
@@ -70,7 +77,8 @@ export function Search() {
           router: {
             createURL({ qsModule, routeState, location }) {
               let queryString = null;
-              let pathname = "/search"
+              let pathname = category ? `/plp/${routeState.genres}` : "/search"
+
               queryString = qsModule.stringify(
                 {
                   q: routeState.q,
@@ -112,7 +120,7 @@ export function Search() {
         }}
       >
         <SearchBox />
-        <Configure />
+        <Configure filters={category ? `genres:${category}` : ""} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
             <div className="w-[15%]">
@@ -162,7 +170,7 @@ export function Search() {
         </div>
         <DebugIS />
       </InstantSearchNext>
-    </div >
+    </div>
   );
 }
 

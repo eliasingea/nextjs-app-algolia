@@ -68,7 +68,7 @@ const Header = () => {
                     detachedMediaQuery={"none"}
                     plugins={[recentSearchesPlugin, querySuggestionsPlugin]}
                     openOnFocus={true}
-                    placeholder="Search Products"
+                    placeholder="Search Movies or TV Shows"
                     initialState={{
                         query: search || "",
                     }}
