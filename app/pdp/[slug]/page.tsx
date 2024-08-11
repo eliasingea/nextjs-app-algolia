@@ -1,5 +1,5 @@
 
-export default function CategoryPage() {
+export default function ProductPage() {
     return (
         <div>
             hey

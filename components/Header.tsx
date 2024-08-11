@@ -31,8 +31,6 @@ const Header = () => {
 
     };
 
-
-
     const querySuggestionsPlugin = createQuerySuggestionsPlugin({
         searchClient,
         indexName: "algoflix_CONFIGURED_query_suggestions",

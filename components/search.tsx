@@ -156,12 +156,12 @@ export function Search({ category }: SearchProps) {
               </div>
 
             </div>
-            <div className="w-full">
+            <div className="w-full pl-2">
               <Hits hitComponent={Hit} classNames={
                 {
                   root: "bg-white",
                   list: "flex flex-wrap",
-                  item: "group relative m-0 flex h-78 w-96 rounded-xl shadow-xl ring-gray-900/5 sm:mx-auto sm:max-w-lg"
+                  item: "group relative m-0 flex rounded-xl ring-gray-900/5 sm:mx-auto sm:max-w-lg"
 
                 }
               } />
