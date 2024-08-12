@@ -7,12 +7,14 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.description}>
         <Link href="/plp/Drama">
-          <h2>PLP - Appliances</h2>
+          <h2>PLP - Drama</h2>
         </Link>
-        <i>
-          after beeing redirected, refresh page to make sure it has been SSR
-          rendered
-        </i>
+        <Link href="/plp/Comedy">
+          <h2>PLP - Comedy</h2>
+        </Link>
+        <Link href="/plp/Adventure">
+          <h2>PLP - Adventure</h2>
+        </Link>
       </div>
     </main>
   );

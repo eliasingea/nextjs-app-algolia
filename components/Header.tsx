@@ -11,6 +11,7 @@ import "@algolia/autocomplete-theme-classic";
 import { createQuerySuggestionsPlugin } from "@algolia/autocomplete-plugin-query-suggestions";
 import algoliasearch from "algoliasearch/lite";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const searchClient = algoliasearch(
     "PMK1FBZCMK",
@@ -60,7 +61,9 @@ const Header = () => {
     });
     return (
         <div className="flex w-screen justify-between p-3">
-            <h1 className="text-xl text-blue-800 w-24 pt-2">Logo</h1>
+            <h1 className="text-xl text-blue-800 w-24 pt-2">
+                <Link href="/">Logo</Link>
+            </h1>
             <div className="pl-12 pr-12 flex-grow">
                 <Autocomplete
                     detachedMediaQuery={"none"}

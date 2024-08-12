@@ -120,7 +120,7 @@ export function Search({ category }: SearchProps) {
         }}
       >
         <SearchBox />
-        <Configure filters={category ? `genres:${category}` : ""} />
+        <Configure filters={category ? `genres:${category}` : ""} hitsPerPage={21} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
             <div className="w-[15%]">
