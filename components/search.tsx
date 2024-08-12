@@ -13,14 +13,20 @@ import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
 import Hit from "./Hit";
 const client = algoliasearch("PMK1FBZCMK", "ed5c1784106c9f709e6d49ee87f57eb6");
-import { useSearchParams, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 const INDEX_NAME = "algoflix_CONFIGURED"
 
 interface SearchProps {
   category: string;
 }
+
+type RouteState = {
+  q?: string;
+  cast?: string[];
+  genres?: string;
+  type?: string[];
+};
 
 function SearchBox(props: UseSearchBoxProps) {
   let { query, refine } = useSearchBox(props);
@@ -49,7 +55,7 @@ export function Search({ category }: SearchProps) {
         }}
         routing={{
           stateMapping: {
-            stateToRoute(uiState: UiState) {
+            stateToRoute(uiState: UiState): RouteState {
               const indexState = uiState[INDEX_NAME];
               return {
                 q: indexState.query,
@@ -58,7 +64,7 @@ export function Search({ category }: SearchProps) {
                 genres: indexState.configure?.filters?.split(":")[1]
               };
             },
-            routeToState(routeState: UiState) {
+            routeToState(routeState: RouteState): UiState {
               const state = {
                 [INDEX_NAME]: {
                   refinementList: {
@@ -75,7 +81,7 @@ export function Search({ category }: SearchProps) {
             },
           },
           router: {
-            createURL({ qsModule, routeState, location }) {
+            createURL({ qsModule, routeState, location }): string {
               let queryString = null;
               let pathname = category ? `/plp/${routeState.genres}` : "/search"
 
@@ -95,7 +101,7 @@ export function Search({ category }: SearchProps) {
 
               return url;
             },
-            parseURL({ location, qsModule }) {
+            parseURL({ location, qsModule }): RouteState {
               let { cast, q, type } = qsModule.parse(location.search.slice(1));
               return {
                 cast: parseParamStringList(
@@ -104,9 +110,7 @@ export function Search({ category }: SearchProps) {
                 type: parseParamStringList(
                   type as string | undefined,
                 ),
-                q: parseParamStringList(
-                  q as string | undefined,
-                ),
+                q: q as string | undefined
               };
             },
             push(this: ReturnType<typeof historyRouter>, url) {
@@ -168,7 +172,7 @@ export function Search({ category }: SearchProps) {
             </div>
           </div>
         </div>
-        <DebugIS />
+        {/* <DebugIS /> */}
       </InstantSearchNext>
     </div>
   );
