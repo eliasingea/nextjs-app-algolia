@@ -21,9 +21,9 @@ interface SearchProps {
 
 type RouteState = {
   q?: string;
-  cast?: string[];
+  cast?: string[] | undefined;
   genres?: string;
-  type?: string[];
+  type?: string[] | undefined;
 };
 
 
@@ -50,16 +50,16 @@ export function Search({ category }: SearchProps) {
               };
             },
             routeToState(routeState: RouteState): UiState {
-              const state = {
+              return {
                 [INDEX_NAME]: {
                   refinementList: {
-                    ["cast.name"]: routeState.cast,
-                    record_type: routeState.type
+                    ["cast.name"]: routeState.cast as string[],
+                    record_type: routeState.type as string[]
                   },
                   query: routeState.q,
                 }
               };
-              return state;
+
             },
           },
           router: {
