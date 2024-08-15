@@ -5,9 +5,7 @@ import {
   Hits,
   RefinementList,
   useInstantSearch,
-  useSearchBox,
   Configure,
-  UseSearchBoxProps,
 } from "react-instantsearch";
 import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
@@ -28,19 +26,6 @@ type RouteState = {
   type?: string[];
 };
 
-function SearchBox(props: UseSearchBoxProps) {
-  let { query, refine } = useSearchBox(props);
-  const { setIndexUiState } = useInstantSearch();
-  const searchParams = useSearchParams();
-  const search = searchParams.get("q") as string;
-  if (typeof query === "object") query = query[0]
-  if (search && (query !== search)) {
-    setIndexUiState({})
-    refine(search);
-  }
-
-  return null;
-}
 
 
 export function Search({ category }: SearchProps) {
@@ -61,7 +46,7 @@ export function Search({ category }: SearchProps) {
                 q: indexState.query,
                 type: indexState.refinementList?.record_type,
                 cast: indexState.refinementList?.["cast.name"],
-                genres: indexState.configure?.filters?.split(":")[1]
+
               };
             },
             routeToState(routeState: RouteState): UiState {
@@ -70,9 +55,6 @@ export function Search({ category }: SearchProps) {
                   refinementList: {
                     ["cast.name"]: routeState.cast,
                     record_type: routeState.type
-                  },
-                  configure: {
-                    filters: routeState.genres
                   },
                   query: routeState.q,
                 }
@@ -83,7 +65,7 @@ export function Search({ category }: SearchProps) {
           router: {
             createURL({ qsModule, routeState, location }): string {
               let queryString = null;
-              let pathname = category ? `/plp/${routeState.genres}` : "/search"
+              let pathname = category ? `/plp/${category}` : "/search"
 
               queryString = qsModule.stringify(
                 {
@@ -123,7 +105,6 @@ export function Search({ category }: SearchProps) {
           },
         }}
       >
-        <SearchBox />
         <Configure filters={category ? `genres:${category}` : ""} hitsPerPage={21} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
