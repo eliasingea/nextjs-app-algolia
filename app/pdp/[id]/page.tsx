@@ -1,17 +1,9 @@
 import React from 'react'
-import Image from 'next/image'
 const TMDB_API_KEY = process.env.TMDB_API_KEY
 const TMDB_BASE_URL = process.env.TMDB_BASE_URL
-import { Heading } from '@/components/ui/heading'
 import Movie from '@/components/Movie'
 import Tv from '@/components/Tv'
 
-import type { MovieType } from '@/components/Movie'
-import type { TvType } from '@/components/Tv'
-
-type Response = {
-    success: boolean
-}
 async function ProductPage({ params }: { params: { id: string } }) {
 
     const contentType = params.id.includes("movie") ? "movie" : "tv"
