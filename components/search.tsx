@@ -6,6 +6,7 @@ import {
   RefinementList,
   useInstantSearch,
   Configure,
+  useSearchBox
 } from "react-instantsearch";
 import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
@@ -26,7 +27,10 @@ type RouteState = {
   type?: string[] | undefined;
 };
 
-
+function CustomSearchBox() {
+  useSearchBox()
+  return null;
+}
 
 export function Search({ category }: SearchProps) {
   return (
@@ -105,6 +109,7 @@ export function Search({ category }: SearchProps) {
           },
         }}
       >
+        <CustomSearchBox />
         <Configure filters={category ? `genres:${category}` : ""} hitsPerPage={21} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">

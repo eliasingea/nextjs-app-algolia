@@ -1,11 +1,9 @@
-import Image from "next/image";
-import styles from "./page.module.css";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
+    <main className="flex flex-col justify-between align-center p-6 min-h-[100vh]">
+      <div className="text-sm w-[100%] z-10 font-mono">
         <Link href="/plp/Drama">
           <h2>PLP - Drama</h2>
         </Link>

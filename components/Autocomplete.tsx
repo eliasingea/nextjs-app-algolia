@@ -1,14 +1,9 @@
 // components/Autocomplete.js
 import { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import dynamic from "next/dynamic";
 import { createElement, Fragment } from "react";
 import { autocomplete } from "@algolia/autocomplete-js";
 import type { Root } from 'react-dom/client';
-
-import { AutocompleteOptions, BaseItem } from "@algolia/autocomplete-core";
-
-
 
 export function Autocomplete(props: any) {
     const containerRef = useRef<HTMLDivElement | null>(null);

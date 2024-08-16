@@ -1,8 +1,9 @@
 "use client";
 import React from "react";
-const Autocomplete = dynamic(() => import("./Autocomplete"), {
-    ssr: false,
-});
+// const Autocomplete = dynamic(() => import("./Autocomplete"), {
+//     ssr: true,
+// });
+import Autocomplete from "./Autocomplete";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 
@@ -22,7 +23,6 @@ const searchClient = algoliasearch(
 const Header = () => {
     const searchParams = useSearchParams();
     const search = searchParams.get("q");
-    console.log(search);
 
     const router = useRouter();
 
