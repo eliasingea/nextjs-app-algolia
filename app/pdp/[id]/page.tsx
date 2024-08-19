@@ -21,10 +21,11 @@ async function ProductPage({ params }: { params: { id: string } }) {
     if (res.success == false) return <h1>{"Movie doesn't exist"}</h1>
     return (
         <div className="p-20 space-y-10">
-            <Recommend id={params.id} />
             {
                 contentType === "movie" ? <Movie movie={res} /> : <Tv tv={res} />
             }
+            <Recommend id={params.id} />
+
         </div>
     );
 }
