@@ -3,6 +3,7 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY
 const TMDB_BASE_URL = process.env.TMDB_BASE_URL
 import Movie from '@/components/Movie'
 import Tv from '@/components/Tv'
+import Recommend from '@/components/Recommend'
 
 async function ProductPage({ params }: { params: { id: string } }) {
 
@@ -20,6 +21,7 @@ async function ProductPage({ params }: { params: { id: string } }) {
     if (res.success == false) return <h1>{"Movie doesn't exist"}</h1>
     return (
         <div className="p-20 space-y-10">
+            <Recommend id={params.id} />
             {
                 contentType === "movie" ? <Movie movie={res} /> : <Tv tv={res} />
             }

@@ -6,7 +6,9 @@ import {
   RefinementList,
   useInstantSearch,
   Configure,
-  useSearchBox
+  useSearchBox,
+  useTrendingItems,
+  UseTrendingItemsProps
 } from "react-instantsearch";
 import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
@@ -31,6 +33,14 @@ function CustomSearchBox() {
   useSearchBox()
   return null;
 }
+
+function CustomTrendingItems(props: UseTrendingItemsProps) {
+  const { items } = useTrendingItems(props);
+  return (
+    <div>Hello</div>
+  );
+}
+
 
 export function Search({ category }: SearchProps) {
   return (
