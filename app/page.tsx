@@ -10,8 +10,8 @@ export default function Home() {
         <Link href="/plp/Comedy">
           <h2>PLP - Comedy</h2>
         </Link>
-        <Link href="/plp/Adventure">
-          <h2>PLP - Adventure</h2>
+        <Link href="/plp/context-Adventure">
+          <h2>Adventure Page - Context Rule</h2>
         </Link>
       </div>
     </main>

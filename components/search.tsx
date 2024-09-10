@@ -43,6 +43,10 @@ function CustomTrendingItems(props: UseTrendingItemsProps) {
 
 
 export function Search({ category }: SearchProps) {
+  let ruleContextBool = false
+  if (category.includes("context")) {
+    ruleContextBool = true
+  }
   return (
     <div>
       <InstantSearchNext
@@ -120,7 +124,7 @@ export function Search({ category }: SearchProps) {
         }}
       >
         <CustomSearchBox />
-        <Configure filters={category ? `genres:${category}` : ""} hitsPerPage={21} />
+        <Configure filters={category && !ruleContextBool ? `genres:${category}` : ""} ruleContexts={ruleContextBool ? [category.substring(category.indexOf("-") + 1)] : []} hitsPerPage={21} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
             <div className="w-[15%]">
