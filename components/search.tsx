@@ -41,6 +41,33 @@ function CustomTrendingItems(props: UseTrendingItemsProps) {
   );
 }
 
+const objectToUrlString = (params: any) => {
+  if (typeof params === "object") {
+    return Object.keys(params)
+      .map((attribute) => {
+        if (!params[attribute]) return
+        return params[attribute]
+          .map((value: any) => `${attribute}=${value}`)
+          .join("+")
+      })?.join("+");
+  }
+};
+
+const urlStringToObject = (urlString: string) => {
+  const params = {} as Record<string, string[]>;
+
+  urlString.split("+").forEach((filter) => {
+    const [key, value] = filter.split("=");
+
+    if (key && value) {
+      params[key] = params[key] || [];
+      params[key]!.push(value);
+    }
+  });
+
+  return params;
+};
+
 
 export function Search({ category }: SearchProps) {
   let ruleContextBool = false
@@ -61,10 +88,8 @@ export function Search({ category }: SearchProps) {
             stateToRoute(uiState: UiState): RouteState {
               const indexState = uiState[INDEX_NAME];
               return {
-                q: indexState.query,
                 type: indexState.refinementList?.record_type,
                 cast: indexState.refinementList?.["cast.name"],
-
               };
             },
             routeToState(routeState: RouteState): UiState {
@@ -85,33 +110,27 @@ export function Search({ category }: SearchProps) {
               let queryString = null;
               let pathname = category ? `/plp/${category}` : "/search"
 
-              queryString = qsModule.stringify(
-                {
-                  q: routeState.q,
-                  cast: routeState.cast,
-                  type: routeState.type
-                },
-                {
-                  addQueryPrefix: true,
-                  arrayFormat: "comma",
-                },
-              );
+              // queryString = qsModule.stringify(
+              //   {
+              //     q: routeState.q,
+              //     cast: routeState.cast,
+              //     type: routeState.type
+              //   },
+              //   {
+              //     addQueryPrefix: true,
+              //     arrayFormat: "comma",
+              //   },
+              // );
+              const urlString = objectToUrlString(routeState);
 
-              const url = `${location.origin}${pathname}${queryString}`;
-
-              return url;
+              return `${location.origin}${pathname}${urlString ? `/${urlString}` : ""}`;
             },
             parseURL({ location, qsModule }): RouteState {
-              let { cast, q, type } = qsModule.parse(location.search.slice(1));
-              return {
-                cast: parseParamStringList(
-                  cast as string | undefined,
-                ),
-                type: parseParamStringList(
-                  type as string | undefined,
-                ),
-                q: q as string | undefined
-              };
+              let urlString = location.pathname.split("/").pop();
+
+              const refinements = urlString ? urlStringToObject(urlString) : {};
+
+              return refinements;
             },
             push(this: ReturnType<typeof historyRouter>, url) {
               if (this.isDisposed) {
