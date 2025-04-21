@@ -15,9 +15,8 @@ import Image from 'next/image';
 
 const Hit = ({ hit }: { hit: CustomHit }) => {
     return (
-        <Link href={`/pdp/${hit.objectID}`}>
+        <Link href={`/pdp/${hit.objectID}`} className="btn-view-product">
             <div className="p-4">
-
                 <div className="z-10 h-full w-full overflow-hidden rounded-xl border border-gray-200 opacity-80 transition duration-300 ease-in-out group-hover:opacity-100 dark:border-gray-700 dark:opacity-70">
                     <Image priority src={`https://image.tmdb.org/t/p/original${hit.backdrop_path}`} height={250} width={600} className="animate-fade-in block scale-100 transform object-cover object-center opacity-100 transition duration-300 group-hover:scale-110" alt="" />
                 </div>
