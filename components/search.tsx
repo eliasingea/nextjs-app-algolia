@@ -8,7 +8,8 @@ import {
   Configure,
   useSearchBox,
   useTrendingItems,
-  UseTrendingItemsProps
+  UseTrendingItemsProps,
+  UseSearchBoxProps
 } from "react-instantsearch";
 import type historyRouter from "instantsearch.js/es/lib/routers/history";
 import type { UiState } from "instantsearch.js";
@@ -29,8 +30,17 @@ type RouteState = {
   type?: string[] | undefined;
 };
 
-function CustomSearchBox() {
-  useSearchBox()
+function SearchBox(props: UseSearchBoxProps) {
+  let { query, refine } = useSearchBox(props);
+  const { setIndexUiState } = useInstantSearch();
+  const searchParams = useSearchParams();
+  const search = searchParams.get("q") as string;
+  if (typeof query === "object") query = query[0]
+  if (search && (query !== search)) {
+    setIndexUiState({})
+    refine(search);
+  }
+
   return null;
 }
 
@@ -43,13 +53,22 @@ function CustomTrendingItems(props: UseTrendingItemsProps) {
 
 const objectToUrlString = (params: any) => {
   if (typeof params === "object") {
-    return Object.keys(params)
-      .map((attribute) => {
-        if (!params[attribute]) return
-        return params[attribute]
-          .map((value: any) => `${attribute}=${value}`)
-          .join("+")
-      })?.join("+");
+    let returnStrings = [];
+    for (let key of Object.keys(params)) {
+      if (!params[key]) continue;
+      if (typeof params[key] === "string" || typeof params[key] === "number") {
+        returnStrings.push(`${key}=${params[key]}`);
+      } else {
+        for (let value of params[key]) {
+          returnStrings.push(`${key}=${value}`);
+        }
+      }
+    }
+    if (returnStrings.length > 1) {
+      return returnStrings.join("+");
+    } else {
+      return returnStrings[0];
+    }
   }
 };
 
@@ -61,7 +80,7 @@ const urlStringToObject = (urlString: string) => {
 
     if (key && value) {
       params[key] = params[key] || [];
-      params[key]!.push(value);
+      params[key]!.push(decodeURIComponent(value));
     }
   });
 
@@ -90,6 +109,7 @@ export function Search({ category }: SearchProps) {
               return {
                 type: indexState.refinementList?.record_type,
                 cast: indexState.refinementList?.["cast.name"],
+                q: indexState.query,
               };
             },
             routeToState(routeState: RouteState): UiState {
@@ -142,7 +162,7 @@ export function Search({ category }: SearchProps) {
           },
         }}
       >
-        <CustomSearchBox />
+        <SearchBox />
         <Configure filters={category && !ruleContextBool ? `genres:${category}` : ""} ruleContexts={ruleContextBool ? [category.substring(category.indexOf("-") + 1)] : []} hitsPerPage={21} />
         <div className="flex min-h-screen flex-col items-center justify-between p-12">
           <div className="flex w-full">
