@@ -52,6 +52,7 @@ function CustomTrendingItems(props: UseTrendingItemsProps) {
 }
 
 const objectToUrlString = (params: any) => {
+  //params = params[INDEX_NAME];
   if (typeof params === "object") {
     let returnStrings = [];
     for (let key of Object.keys(params)) {
@@ -98,68 +99,73 @@ export function Search({ category }: SearchProps) {
       <InstantSearchNext
         searchClient={client}
         indexName={INDEX_NAME}
-        insights
+        insights={{
+          insightsInitParams: {
+            useCookie: true
+            // …
+          }
+        }}
         future={{
           preserveSharedStateOnUnmount: true
         }}
         routing={{
           stateMapping: {
             stateToRoute(uiState: UiState): RouteState {
-              const indexState = uiState[INDEX_NAME];
+              const indexState = uiState[INDEX_NAME] || {};
+              const { query, configure, ...rest } = indexState;
+
               return {
-                type: indexState.refinementList?.record_type,
-                cast: indexState.refinementList?.["cast.name"],
-                q: indexState.query,
+                q: query,        // put query at top-level
+                ...rest,         // everything else stays flat
               };
             },
+
             routeToState(routeState: RouteState): UiState {
+              const { q, ...rest } = routeState;
+
               return {
                 [INDEX_NAME]: {
-                  refinementList: {
-                    ["cast.name"]: routeState.cast as string[],
-                    record_type: routeState.type as string[]
-                  },
-                  query: routeState.q,
-                }
+                  ...rest,
+                  query: q,      // re-inject query back into InstantSearch state
+                },
               };
-
             },
           },
-          router: {
-            createURL({ qsModule, routeState, location }): string {
-              let queryString = null;
-              let pathname = category ? `/plp/${category}` : "/search"
+          // router: {
+          //   createURL({ qsModule, routeState, location }): string {
+          //     let queryString = null;
+          //     let pathname = category ? `/plp/${category}` : "/search"
 
-              // queryString = qsModule.stringify(
-              //   {
-              //     q: routeState.q,
-              //     cast: routeState.cast,
-              //     type: routeState.type
-              //   },
-              //   {
-              //     addQueryPrefix: true,
-              //     arrayFormat: "comma",
-              //   },
-              // );
-              const urlString = objectToUrlString(routeState);
+          //     // queryString = qsModule.stringify(
+          //     //   {
+          //     //     q: routeState.q,
+          //     //     cast: routeState.cast,
+          //     //     type: routeState.type
+          //     //   },
+          //     //   {
+          //     //     addQueryPrefix: true,
+          //     //     arrayFormat: "comma",
+          //     //   },
+          //     // );
+          //     const urlString = objectToUrlString(routeState);
 
-              return `${location.origin}${pathname}${urlString ? `/${urlString}` : ""}`;
-            },
-            parseURL({ location, qsModule }): RouteState {
-              let urlString = location.pathname.split("/").pop();
+          //     return `${location.origin}${pathname}${urlString ? `?${urlString}` : ""}`;
+          //   },
+          //   parseURL({ location, qsModule }): RouteState {
+          //     let urlString = location.pathname.split("?").pop();
 
-              const refinements = urlString ? urlStringToObject(urlString) : {};
+          //     const refinements = urlString ? urlStringToObject(urlString) : {};
 
-              return refinements;
-            },
-            push(this: ReturnType<typeof historyRouter>, url) {
-              if (this.isDisposed) {
-                return;
-              }
-              history.pushState({}, "", url);
-            },
-            cleanUrlOnDispose: true,
-          },
+          //     return refinements;
+          //   },
+          //   push(this: ReturnType<typeof historyRouter>, url) {
+          //     if (this.isDisposed) {
+          //       return;
+          //     }
+          //     history.pushState({}, "", url);
+          //   },
+          //   cleanUrlOnDispose: true,
+          // },
         }}
       >
         <SearchBox />
